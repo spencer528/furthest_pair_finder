@@ -1,4 +1,4 @@
-package farthestpairfinder;
+package furthestpairfinder;
 
 public class Vector {
     

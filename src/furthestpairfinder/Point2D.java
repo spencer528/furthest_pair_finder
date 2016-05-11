@@ -1,4 +1,4 @@
-package farthestpairfinder;
+package furthestpairfinder;
 
 import java.awt.*;
 
