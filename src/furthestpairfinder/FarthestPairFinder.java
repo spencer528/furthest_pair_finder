@@ -111,6 +111,65 @@ public class FarthestPairFinder extends JFrame {
         }
     }
     
+    
+    public void findConvexHull2() {
+        ArrayList<Integer> points_outside = new ArrayList();//keeps track of the index of points inside of the convex hull
+        int indexOfLowestPoint=0;
+        
+        //find the point closest to the bottom using one swip of selection sort and to add terms to S_list
+        for(int i=0; i<S.length; i++){
+            points_outside.add(i);
+            if(S[i].y>S[indexOfLowestPoint].y){indexOfLowestPoint=i;}
+        }
+        
+        points_outside.set(0, indexOfLowestPoint);//switch the first point with the lowest point so the algorithm starts with the lowest point
+        points_outside.set(indexOfLowestPoint, 0);
+        
+        Vector h = new Vector(1,0);//horizontal vector to compare
+        double[] angles = new double[S.length];
+        for(int i=0; i<angles.length; i++){
+            Vector temperary_vector = new Vector(S[points_outside.get(0)], S[points_outside.get(i)]);
+            angles[i]=h.getAngle(temperary_vector);
+        }
+        
+        //sort the angles:
+        
+        
+        //initialize the 'temp' vector
+        Vector v1 = new Vector(S[points_outside.get(0)].x-S[points_outside.get(1)].x, S[points_outside.get(0)].y-S[points_outside.get(1)].y);
+        //vector 'v' is used as a temperary variable to keep track of the current convex hull point and the previous one;
+        int chp=1;//'chp' is an counter used to keep track of the current convex hall point
+        
+        for(int i=1; i<points_outside.size()-1;i++){
+            Vector v2 = new Vector(S[points_outside.get(i)].x-S[points_outside.get(i+1)].x, S[points_outside.get(i)].y-S[points_outside.get(i+1)].y);
+            if(v1.getAngle(v2))
+        }
+        
+        while(true){
+            
+            smallestAngle=Math.PI;
+            int indexOfNextPoint=0;
+            
+            for(Integer k: points_inside){
+                temp = new Vector(S[k].x-S[chp].x, S[k].y-S[chp].y);
+                if(v.getAngle(temp)<smallestAngle){
+                    indexOfNextPoint=k;
+                    smallestAngle=v.getAngle(temp);
+                }
+            }
+            if(indexOfNextPoint==indexOfLowestPoint){break;}
+            
+            convexHull.add(S[indexOfNextPoint]);//adds point to convex hull
+            chp=indexOfNextPoint;//sets current point for next cycle as index of next point
+            points_inside.remove(points_inside.indexOf(chp));//removes point from list of points in convex hull
+            
+            int m=convexHull.size()-1;//temperary value m too reference as the current size of the convex hull
+            v = new Vector(convexHull.get(m).x-convexHull.get(m-1).x,  convexHull.get(m).y-convexHull.get(m-1).y);
+        }
+    }
+    
+    
+    
     public void findFarthestPair_EfficientWay() {
         int n = convexHull.size();
         double largestDistance=0;
