@@ -23,6 +23,8 @@ public class FarthestPairFinder extends JFrame {
      Color genericColour = Color.yellow;
      Color largestDistanceColour = Color.red;
      
+     int indexOfLowestPoint=0;
+     
     
     //fills S with random points
     public void makeRandomPoints() {
@@ -46,6 +48,11 @@ public class FarthestPairFinder extends JFrame {
             g.drawOval((int)S[i].x-pointSize/2, (int)S[i].y-pointSize/2, pointSize-1, pointSize-1);
         }
         
+        g.setColor(Color.white);
+            g.fillOval((int)S[indexOfLowestPoint].x-pointSize/2, (int)S[indexOfLowestPoint].y-pointSize/2, pointSize, pointSize);
+            g.setColor(genericColour.darker());
+            g.drawOval((int)S[indexOfLowestPoint].x-pointSize/2, (int)S[indexOfLowestPoint].y-pointSize/2, pointSize-1, pointSize-1);
+        
         //draw the points in the convex hull
         g.setColor(convexHullColour);
         int temp;
@@ -65,6 +72,52 @@ public class FarthestPairFinder extends JFrame {
         double distance = Math.pow(x1-x2, 2)+Math.pow(y1-y2, 2);
         distance = Math.sqrt(distance);
         return distance;
+    }
+    
+    private static double[][] mergeSort(double[][] array_one, double[][] array_two) {
+        
+        // for all the arrays: first number is the index, second is the value
+        
+        double[][] c = new double[array_one.length + array_two.length][2];
+        int i = 0;//keeps track of index of array one
+        int j = 0;//keeps track of index of array two
+        int k = 0;//keeps track of index of new merged array
+        
+	int length_one = array_one.length;
+        int length_two = array_two.length;
+
+        while ( i < length_one && j < length_two ) {
+            if ( array_one[i][1] <= array_two[j][1] ) {
+                c[k][1] = array_one[i][1];
+                c[k][0] = array_one[i][0];
+                i++;
+            } 
+	    
+	    else {
+                c[k][1] = array_two[j][1];
+                c[k][1] = array_two[j][0];
+                j++;
+            }
+            k++;
+        }
+
+        if(i == length_one){
+            for (int m = j; m < length_two; m++) {
+                c[k][1] = array_two[m][1];
+                c[k][0] = array_two[m][0];
+                k++;
+            }
+        }
+        
+        else{
+            for (int m = i; m < length_one; m++) {
+                c[k][1] = array_one[m][1];
+                c[k][0] = array_one[m][0];
+                k++;
+            }
+        }
+        
+        return c;
     }
     
     public void findConvexHull() {
@@ -112,61 +165,6 @@ public class FarthestPairFinder extends JFrame {
     }
     
     
-    public void findConvexHull2() {
-        ArrayList<Integer> points_outside = new ArrayList();//keeps track of the index of points inside of the convex hull
-        int indexOfLowestPoint=0;
-        
-        //find the point closest to the bottom using one swip of selection sort and to add terms to S_list
-        for(int i=0; i<S.length; i++){
-            points_outside.add(i);
-            if(S[i].y>S[indexOfLowestPoint].y){indexOfLowestPoint=i;}
-        }
-        
-        points_outside.set(0, indexOfLowestPoint);//switch the first point with the lowest point so the algorithm starts with the lowest point
-        points_outside.set(indexOfLowestPoint, 0);
-        
-        Vector h = new Vector(1,0);//horizontal vector to compare
-        double[] angles = new double[S.length];
-        for(int i=0; i<angles.length; i++){
-            Vector temperary_vector = new Vector(S[points_outside.get(0)], S[points_outside.get(i)]);
-            angles[i]=h.getAngle(temperary_vector);
-        }
-        
-        //sort the angles:
-        
-        
-        //initialize the 'temp' vector
-        Vector v1 = new Vector(S[points_outside.get(0)].x-S[points_outside.get(1)].x, S[points_outside.get(0)].y-S[points_outside.get(1)].y);
-        //vector 'v' is used as a temperary variable to keep track of the current convex hull point and the previous one;
-        int chp=1;//'chp' is an counter used to keep track of the current convex hall point
-        
-        for(int i=1; i<points_outside.size()-1;i++){
-            Vector v2 = new Vector(S[points_outside.get(i)].x-S[points_outside.get(i+1)].x, S[points_outside.get(i)].y-S[points_outside.get(i+1)].y);
-            if(v1.getAngle(v2))
-        }
-        
-        while(true){
-            
-            smallestAngle=Math.PI;
-            int indexOfNextPoint=0;
-            
-            for(Integer k: points_inside){
-                temp = new Vector(S[k].x-S[chp].x, S[k].y-S[chp].y);
-                if(v.getAngle(temp)<smallestAngle){
-                    indexOfNextPoint=k;
-                    smallestAngle=v.getAngle(temp);
-                }
-            }
-            if(indexOfNextPoint==indexOfLowestPoint){break;}
-            
-            convexHull.add(S[indexOfNextPoint]);//adds point to convex hull
-            chp=indexOfNextPoint;//sets current point for next cycle as index of next point
-            points_inside.remove(points_inside.indexOf(chp));//removes point from list of points in convex hull
-            
-            int m=convexHull.size()-1;//temperary value m too reference as the current size of the convex hull
-            v = new Vector(convexHull.get(m).x-convexHull.get(m-1).x,  convexHull.get(m).y-convexHull.get(m-1).y);
-        }
-    }
     
     
     
@@ -185,6 +183,7 @@ public class FarthestPairFinder extends JFrame {
                 }
             }
         }
+        System.out.println("Size is "+convexHull.size()+" and indexes are "+pointOne+" "+pointTwo);
         farthestPair[0] = convexHull.get(pointOne);
         farthestPair[1] = convexHull.get(pointTwo);
     }
@@ -221,17 +220,17 @@ public class FarthestPairFinder extends JFrame {
 
         fpf.makeRandomPoints();
         
-        fpf.findConvexHull();
+        long startTime2 = System.nanoTime();
+        fpf.findFarthestPair_BruteForceWay();
+        long endTime2 = System.nanoTime();
+        System.out.println("Brute Force Method took: "+(endTime2-startTime2)+" nanoSeconds");
         
         long startTimeE = System.nanoTime();
+        fpf.findConvexHull();
         fpf.findFarthestPair_EfficientWay();
         long endTimeE = System.nanoTime();
-        System.out.println("Efficient way took: "+(endTimeE-startTimeE)+" nanoSeconds");
+        System.out.println("Convex Hull Method took: "+(endTimeE-startTimeE)+" nanoSeconds");
         
-        long startTimeB = System.nanoTime();
-        fpf.findFarthestPair_BruteForceWay();
-        long endTimeB = System.nanoTime();
-        System.out.println("Efficient way took: "+(endTimeB-startTimeB)+" nanoSeconds");
         
         fpf.setVisible(true); 
     }
