@@ -29,14 +29,6 @@ public class Vector {
         return Math.acos( vDotw / (magV*magW) );
     }
     
-    public boolean clockwizeCheck(Vector other){
-        double magV = this.magnitude();
-        double magW = other.magnitude();
-        Vector o = new Vector(this.xComponent/magV+other.xComponent/(magW), this.yComponent/magV+other.yComponent/(2*magW));
-        if(o.getAngle(other)>this.getAngle(other)){return true;}
-        else{return false;}
-    }
-    
     //only used inside getAngle()
     private double dotProduct( Vector other ) {
         return this.xComponent*other.xComponent + this.yComponent*other.yComponent;
